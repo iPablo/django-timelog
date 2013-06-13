@@ -18,6 +18,11 @@ class Command(BaseCommand):
             action='store_false',
             default=True,
             help='Show paths instead of views'),
+        make_option('--noprogress',
+            dest='progress',
+            action='store_false',
+            default=True,
+            help='Suppress displaying progress bar'),
         )
 
     def handle(self, *args, **options):
@@ -31,7 +36,7 @@ class Command(BaseCommand):
         LOGFILE = options.get('file')
 
         try:
-            data = analyze_log_file(LOGFILE, PATTERN, reverse_paths=options.get('reverse'))
+            data = analyze_log_file(LOGFILE, PATTERN, reverse_paths=options.get('reverse'), progress=options.get('progress'))
         except IOError:
             print "File not found"
             exit(2)
