@@ -69,6 +69,10 @@ def generate_table_from(data):
 
     return table.draw()
 
+def generate_csv_from(data):
+    for item in sorted(data):
+        print('"{0}","{1}","{2}","{3}"'.format(data[item]['view'], data[item]['method'], data[item]['status'], data[item]['count']))
+
 def analyze_log_file(logfile, pattern, reverse_paths=True, progress=True):
     "Given a log file and regex group and extract the performance data"
     if progress:
