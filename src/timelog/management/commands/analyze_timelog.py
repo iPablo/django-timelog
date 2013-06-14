@@ -27,17 +27,18 @@ class Command(BaseCommand):
             action='store_false',
             default=True,
             help='Show paths instead of views'),
-        make_option('--noprogress',
+        make_option('--showprogress',
             dest='progress',
-            action='store_false',
-            default=True,
-            help='Suppress displaying progress bar'),
+            action='store_true',
+            default=False,
+            help='Show progress bar when analyzing the log file'),
         )
 
     def handle(self, *args, **options):
 
         if options.get('output') not in self.generate_output_functions:
             print "Invalid output format, valid choices are {0}".format(generate_output_functions.keys())
+            exit(2)
 
         LOGFILE = options.get('file')
 
@@ -48,4 +49,4 @@ class Command(BaseCommand):
             exit(2)
 
         generate_output_fn = self.generate_output_functions[options.get('output')]
-        print generate_table_from(generate_output_fn(data))
+        print generate_output_fn(data)
