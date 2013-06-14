@@ -3,7 +3,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from timelog.lib import generate_table_from, generate_csv_from, analyze_log_file, PATTERN
+from timelog.lib import add_stats_to, generate_table_from, generate_csv_from, analyze_log_file, PATTERN
 
 
 class Command(BaseCommand):
@@ -32,7 +32,7 @@ class Command(BaseCommand):
             action='store_true',
             default=False,
             help='Show progress bar when analyzing the log file'),
-        )
+    )
 
     def handle(self, *args, **options):
 
@@ -43,10 +43,11 @@ class Command(BaseCommand):
         LOGFILE = options.get('file')
 
         try:
-            data = analyze_log_file(LOGFILE, PATTERN, reverse_paths=options.get('reverse'), progress=options.get('progress'))
+            raw_data = analyze_log_file(LOGFILE, PATTERN, reverse_paths=options.get('reverse'), progress=options.get('progress'))
         except IOError:
             print "File not found"
             exit(2)
 
+        data = add_stats_to(raw_data)
         generate_output_fn = self.generate_output_functions[options.get('output')]
         print generate_output_fn(data)

@@ -1,3 +1,4 @@
+import copy
 import fileinput
 from re import compile
 from django.conf import settings
@@ -45,6 +46,26 @@ def view_name_from(path):
         CACHED_VIEWS[path] = view
         return view
 
+def add_stats_to(raw_data):
+    data = {}
+    for item in raw_data:
+        data[item] = copy.deepcopy(raw_data[item])
+
+        data[item]['mean'] = round(sum(data[item]['times'])/data[item]['count'], 3)
+        data[item]['mean_sql'] = round(sum(data[item]['sql'])/data[item]['count'], 3)
+        data[item]['mean_sqltime'] = round(sum(data[item]['sqltime'])/data[item]['count'], 3)
+        
+        sdsq = sum([(i - data[item]['mean']) ** 2 for i in data[item]['times']])
+        try:
+            data[item]['stdev'] = '%.2f' % ((sdsq / (len(data[item]['times']) - 1)) ** .5)
+        except ZeroDivisionError:
+            data[item]['stdev'] = '0.00'
+
+        data[item]['minimum'] = "%.2f" % min(data[item]['times'])
+        data[item]['maximum'] = "%.2f" % max(data[item]['times'])
+
+    return data
+
 def generate_table_from(data):
     "Output a nicely formatted ascii table"
     table = Texttable(max_width=120)
@@ -52,27 +73,32 @@ def generate_table_from(data):
     table.set_cols_align(["l", "l", "l", "r", "r", "r", "r", "r", "r", "r"])
 
     for item in sorted(data):
-        mean = round(sum(data[item]['times'])/data[item]['count'], 3)
-
-        mean_sql = round(sum(data[item]['sql'])/data[item]['count'], 3)
-        mean_sqltime = round(sum(data[item]['sqltime'])/data[item]['count'], 3)
-        
-        sdsq = sum([(i - mean) ** 2 for i in data[item]['times']])
-        try:
-            stdev = '%.2f' % ((sdsq / (len(data[item]['times']) - 1)) ** .5)
-        except ZeroDivisionError:
-            stdev = '0.00'
-
-        minimum = "%.2f" % min(data[item]['times'])
-        maximum = "%.2f" % max(data[item]['times'])
-        table.add_row([data[item]['view'], data[item]['method'], data[item]['status'], data[item]['count'], minimum, maximum, '%.3f' % mean, stdev, mean_sql, mean_sqltime])
+        table.add_row([data[item]['view'],
+                       data[item]['method'],
+                       data[item]['status'],
+                       data[item]['count'],
+                       data[item]['minimum'],
+                       data[item]['maximum'],
+                       '%.3f' % data[item]['mean'],
+                       data[item]['stdev'],
+                       data[item]['mean_sql'],
+                       data[item]['mean_sqltime']])
 
     return table.draw()
 
 def generate_csv_from(data):
-    output = ""
+    output = '"view","method","status","count","minimum","maximum","mean","stdev","queries","querytime"\n'
     for item in sorted(data):
-        output += '"{0}","{1}","{2}","{3}"\n'.format(data[item]['view'], data[item]['method'], data[item]['status'], data[item]['count'])
+        output += '"{0}","{1}","{2}","{3}","{4}","{5}","{6}","{7}","{8}","{9}"\n'.format(data[item]['view'],
+                                                                                         data[item]['method'],
+                                                                                         data[item]['status'],
+                                                                                         data[item]['count'],
+                                                                                         data[item]['minimum'],
+                                                                                         data[item]['maximum'],
+                                                                                         '%.3f' % data[item]['mean'],
+                                                                                         data[item]['stdev'],
+                                                                                         data[item]['mean_sql'],
+                                                                                         data[item]['mean_sqltime'])
     return output
 
 def analyze_log_file(logfile, pattern, reverse_paths=True, progress=True):
