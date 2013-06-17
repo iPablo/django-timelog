@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Timelog</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <td><strong>View</strong></td>
+                <td><strong>Method</strong></td>
+                <td><strong>Status</strong></td>
+                <td><strong>Mean</strong></td>
+                <td><strong>Minumum</strong></td>
+                <td><strong>Maximum</strong></td>
+                <td><strong>Count</strong></td>
+                <td><strong>Standard Deviation</strong></td>
+            </tr>
+        </thead>
+        {% for record in data %}
+            <tr>
+                <td>{{ record.view }}</td>
+                <td>{{ record.method }}</td>
+                <td>{{ record.status }}</td>
+                <td>{{ record.mean }}</td>
+                <td>{{ record.minimum }}</td>
+                <td>{{ record.maximum }}</td>
+                <td>{{ record.count }}</td>
+                <td>{{ record.stdev }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

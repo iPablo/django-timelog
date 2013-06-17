@@ -74,12 +74,8 @@ Lastly, if you have particular URIs you wish to ignore you can define them using
     '.jpg$',            # Ignores all URIs ending in .jpg
 )</pre>
 
-h2. Future Plans
+h2. Viewing Data from your Django Application
 
-In the near future there are plans to enhance this library to support
+There is a very, very, very basic view to display the timelog analysis data, which you can integrate into your own applications by including the following in your url configuration:
 
-* Simple UI for viewing results that can be incorporated into your own applications
-* Filtering results by date and time
-* Output further debugging information for slow queries
-
-Of course, if anyone likes this fork of the django-timelog library, and wants to suggest/contribute new features, changes or improvements, they are more than welcome.
+<pre>(r'^timelog/', include('timelog.urls')),</pre>

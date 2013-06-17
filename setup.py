@@ -16,6 +16,7 @@ setup(
     install_requires=[
         'texttable',
         'progressbar',
+        'django',
     ],
     classifiers = [
         "Intended Audience :: Developers",
