@@ -38,7 +38,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         if options.get('output') not in self.generate_output_functions:
-            print "Invalid output format, valid choices are {0}".format(generate_output_functions.keys())
+            print "Invalid output format, valid choices are {0}".format(self.generate_output_functions.keys())
             exit(2)
 
         LOGFILE = options.get('file')
