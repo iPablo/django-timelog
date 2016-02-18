@@ -101,6 +101,36 @@ def generate_csv_from(data):
                                                                                          data[item]['mean_sqltime'])
     return output
 
+
+def generate_fields_from(data):
+    output = list()
+
+    header = ("view","method","status","count","minimum","maximum","mean",
+              "stdev","queries","querytime")
+    output.append(header)
+
+    for item in sorted(data):
+        row = [data[item]['view'],
+               data[item]['method'],
+               data[item]['status'],
+               data[item]['count'],
+               data[item]['minimum'],
+               data[item]['maximum'],
+               '%.3f' % data[item]['mean'],
+               data[item]['stdev'],
+               data[item]['mean_sql'],
+               data[item]['mean_sqltime']]
+        output.append([str(value) for value in row])
+
+    widths = [max([len(r[i]) for r in output]) for i in range(len(header))]
+
+    align = (["<"] * 3) + ([">"] * 7)
+    template = " ".join(["{%d:%s%d}" % (i, align[i], w) for i, w in enumerate(widths)])
+
+    footer = "\n(%d entries)" % len(data)
+    return "\n".join([template.format(*row) for row in output]) + footer
+
+
 def analyze_log_file(logfile, pattern, reverse_paths=True, progress=True):
     "Given a log file and regex group and extract the performance data"
     if progress:

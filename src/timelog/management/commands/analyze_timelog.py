@@ -3,14 +3,15 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from timelog.lib import add_stats_to, generate_table_from, generate_csv_from, analyze_log_file, PATTERN
+from timelog.lib import add_stats_to, generate_table_from, generate_csv_from, generate_fields_from, analyze_log_file, PATTERN
 
 
 class Command(BaseCommand):
 
     generate_output_functions = {
-        'table': generate_table_from,
-        'csv':   generate_csv_from,
+        'table':  generate_table_from,
+        'csv':    generate_csv_from,
+        'fields': generate_fields_from,
     }
 
     option_list = BaseCommand.option_list + (
