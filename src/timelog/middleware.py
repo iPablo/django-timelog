@@ -17,10 +17,7 @@ class TimeLogMiddleware(object):
         # and the original traceback will be lost (original exception will be
         # replaced with AttributeError)
 
-        sqltime = 0.0
-
-        for q in connection.queries:
-            sqltime += float(getattr(q, 'time', 0.0))
+        sqltime = sum([float(q.get('time', 0.0)) for q in connection.queries])
 
         if hasattr(request, '_start'):
             d = {
