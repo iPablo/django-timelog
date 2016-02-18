@@ -9,20 +9,21 @@ logger = logging.getLogger(__name__)
 class TimeLogMiddleware(object):
 
     def process_request(self, request):
-        request._start = time.time()
+        request._start = time.clock()
 
     def process_response(self, request, response):
         # if an exception is occured in a middleware listed
         # before TimeLogMiddleware then request won't have '_start' attribute
         # and the original traceback will be lost (original exception will be
         # replaced with AttributeError)
+        response_time = time.clock() - request._start
 
         sqltime = sum([float(q.get('time', 0.0)) for q in connection.queries])
 
         if hasattr(request, '_start'):
             d = {
                 'method': request.method,
-                'time': time.time() - request._start,
+                'time': response_time,
                 'code': response.status_code,
                 'url': smart_str(request.path_info),
                 'sql': len(connection.queries),
