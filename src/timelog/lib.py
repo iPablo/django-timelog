@@ -1,5 +1,6 @@
 import copy
 import fileinput
+import UserDict
 from re import compile
 from django.conf import settings
 
@@ -138,10 +139,12 @@ def analyze_log_file(logfile, pattern, reverse_paths=True, progress=True):
         pbar = ProgressBar(widgets=[Percentage(), Bar()], maxval=lines+1).start()
     
     counter = 0
-    data = {}
+    data = AnalyzeAggregator()
     errors = []
     
     compiled_pattern = compile(pattern)
+    ignored_patterns = [compile(p) for p in IGNORE_PATHS]
+
     for line in fileinput.input([logfile]):
         counter = counter + 1
 
@@ -162,36 +165,16 @@ def analyze_log_file(logfile, pattern, reverse_paths=True, progress=True):
         sql = parsed[5]
         sqltime = parsed[6]
 
-        try:
-            ignore = False
-            for ignored_path in IGNORE_PATHS:
-                compiled_path = compile(ignored_path)
-                if compiled_path.match(path):
-                    ignore = True
-            if not ignore:
+        ignore = any([p.match(path) for p in ignored_patterns])
+
+        if not ignore:
+            try:
+                view = view_name_from(path) if reverse_paths else path
+                data.add(view, status, method, float(time), int(sql), float(sqltime))
+            except Resolver404:
                 if reverse_paths:
-                    view = view_name_from(path)
-                else:
-                    view = path
-                key = "%s-%s-%s" % (view, status, method)
-                try:
-                    data[key]['count'] = data[key]['count'] + 1
-                    data[key]['times'].append(float(time))
-                    data[key]['sql'].append(int(sql))
-                    data[key]['sqltime'].append(float(sqltime))
-                except KeyError:
-                    data[key] = {
-                        'count': 1,
-                        'status': status,
-                        'view': view,
-                        'method': method,
-                        'times': [float(time)],
-                        'sql': [int(sql)],
-                        'sqltime': [float(sqltime)],
-                    }
-        except Resolver404:
-            pass
-        
+                    data.add('__resolver404__', status, method, float(time), int(sql), float(sqltime))
+
         if progress:
             pbar.update(counter)
     
@@ -199,3 +182,23 @@ def analyze_log_file(logfile, pattern, reverse_paths=True, progress=True):
         pbar.finish()
     
     return data, errors
+
+
+class AnalyzeAggregator(UserDict.IterableUserDict):
+    def add(self, view, status, method, time, sql, sqltime):
+        key = "%s-%s-%s" % (view, status, method)
+        try:
+            self[key]['count'] = self[key]['count'] + 1
+            self[key]['times'].append(time)
+            self[key]['sql'].append(sql)
+            self[key]['sqltime'].append(sqltime)
+        except KeyError:
+            self[key] = {
+                'count': 1,
+                'status': status,
+                'view': view,
+                'method': method,
+                'times': [time],
+                'sql': [sql],
+                'sqltime': [sqltime],
+            }
