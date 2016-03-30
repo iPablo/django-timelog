@@ -8,7 +8,7 @@ from progressbar import ProgressBar, Percentage, Bar
 
 from django.core.urlresolvers import resolve, Resolver404
 
-PATTERN = r"""^([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:]{8},[0-9]{3}) (GET|POST|PUT|DELETE|HEAD) "(.*)" \((.*)\) (.*?) \((\d+)q, (.*?)\)"""
+PATTERN = r"""^([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:]{8},[0-9]{3}) (GET|POST|PUT|DELETE|HEAD|OPTIONS|TRACE|CONNECT|PATCH) "(.*)" \((.*)\) (.*?) \((\d+)q, (.*?)\)"""
 
 CACHED_VIEWS = {}
 
