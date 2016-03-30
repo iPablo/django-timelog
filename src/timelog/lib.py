@@ -136,17 +136,24 @@ def analyze_log_file(logfile, pattern, reverse_paths=True, progress=True):
     if progress:
         lines = count_lines_in(logfile)
         pbar = ProgressBar(widgets=[Percentage(), Bar()], maxval=lines+1).start()
-        counter = 0
     
+    counter = 0
     data = {}
+    errors = []
     
     compiled_pattern = compile(pattern)
     for line in fileinput.input([logfile]):
-        
-        if progress:
-            counter = counter + 1
-        
-        parsed = compiled_pattern.findall(line)[0]
+        counter = counter + 1
+
+        matches = compiled_pattern.findall(line)
+        if not matches:
+            errors.append({
+                'line_number': counter,
+                'line_content': line.strip(),
+                })
+            continue
+
+        parsed = matches[0]
         date = parsed[0]
         method = parsed[1]
         path = parsed[2]
@@ -191,4 +198,4 @@ def analyze_log_file(logfile, pattern, reverse_paths=True, progress=True):
     if progress:
         pbar.finish()
     
-    return data
+    return data, errors

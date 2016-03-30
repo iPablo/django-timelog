@@ -4,6 +4,7 @@
     <title>Timelog</title>
 </head>
 <body>
+    <h1>Timelog</h1>
     <table>
         <thead>
             <tr>
@@ -30,5 +31,27 @@
             </tr>
         {% endfor %}
     </table>
+    {% if errors %}
+    <h2>Errors</h2>
+    <p>{{ errors|length }} errors found in log file.</p>
+    <table>
+        <thead>
+            <tr>
+                <td><strong>Line Number</strong></td>
+                <td><strong>Content</strong></td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for error in errors %}
+            <tr>
+                <td>{{ error.line_number }}</td>
+                <td>{{ error.line_content }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No errors found in log file.</p>
+    {% endif %}
 </body>
 </html>

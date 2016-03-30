@@ -33,6 +33,11 @@ class Command(BaseCommand):
             action='store_true',
             default=False,
             help='Show progress bar when analyzing the log file'),
+        make_option('--showerrors',
+            dest='showerrors',
+            action='store_true',
+            default=False,
+            help='Show errors found in the log file'),
     )
 
     def handle(self, *args, **options):
@@ -44,10 +49,18 @@ class Command(BaseCommand):
         LOGFILE = options.get('file')
 
         try:
-            raw_data = analyze_log_file(LOGFILE, PATTERN, reverse_paths=options.get('reverse'), progress=options.get('progress'))
+            raw_data, errors = analyze_log_file(LOGFILE, PATTERN, reverse_paths=options.get('reverse'), progress=options.get('progress'))
         except IOError:
             print "File not found"
             exit(2)
+
+        if options.get('showerrors'):
+            if errors:
+                print "Error reading the following lines:"
+                for error in errors:
+                    print "line %d: %s" % (error['line_number'], error['line_content'])
+            else:
+                print "No errors reading the log file"
 
         data = add_stats_to(raw_data)
         generate_output_fn = self.generate_output_functions[options.get('output')]
