@@ -170,9 +170,10 @@ def analyze_log_file(logfile, pattern, reverse_paths=True, progress=True):
         if not ignore:
             try:
                 view = view_name_from(path) if reverse_paths else path
-                data.add(view, status, method, float(time), int(sql), float(sqltime))
             except Resolver404:
-                data.add('__resolver404__', status, method, float(time), int(sql), float(sqltime))
+                view = '__resolver404__'
+
+            data.add(view, status, method, float(time), int(sql), float(sqltime))
 
         if progress:
             pbar.update(counter)
