@@ -16,6 +16,8 @@
                 <td><strong>Maximum</strong></td>
                 <td><strong>Count</strong></td>
                 <td><strong>Standard Deviation</strong></td>
+                <td><strong>Mean SQL Queries</strong></td>
+                <td><strong>Mean SQL Time</strong></td>
             </tr>
         </thead>
         {% for record in data %}
@@ -28,6 +30,8 @@
                 <td>{{ record.maximum }}</td>
                 <td>{{ record.count }}</td>
                 <td>{{ record.stdev }}</td>
+                <td>{{ record.mean_sql }}</td>
+                <td>{{ record.mean_sqltime }}</td>
             </tr>
         {% endfor %}
     </table>
