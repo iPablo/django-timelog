@@ -1,12 +1,13 @@
 import time
 import logging
 from django.db import connection
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import smart_str
 
 logger = logging.getLogger(__name__)
 
 
-class TimeLogMiddleware(object):
+class TimeLogMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         # py2.7: DO NOT USE time.clock() - although it is used for benchmarking

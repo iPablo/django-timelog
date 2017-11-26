@@ -1,3 +1,5 @@
+Modified by Pablo Iglesias [@iPablo](https://github.com/iPablo "@iPablo") - runs with django 1.10
+
 A simple django middleware that logs request times using the Django 1.3 logging support, and a management command to analyze the resulting data. Once installed and configured you can run the command:
 
 <pre>python manage.py analyze_timelog</pre>
